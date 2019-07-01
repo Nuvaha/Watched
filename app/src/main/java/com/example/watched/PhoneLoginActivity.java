@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PhoneLoginActivity extends AppCompatActivity {
 
-    private EditText edtPhone, edtSend;
+    private EditText edtPhone, edtVerification;
     private Button btnSend, btnVerify;
 
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
@@ -45,6 +45,8 @@ public class PhoneLoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_login);
 
+        mAuth = FirebaseAuth.getInstance();
+
         init();
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,7 +55,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 String phoneNumber = edtPhone.getText().toString();
 
                 if (TextUtils.isEmpty(phoneNumber)){
-                    Toast.makeText(PhoneLoginActivity.this, "please enter phone", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PhoneLoginActivity.this, "phone number is requied", Toast.LENGTH_SHORT).show();
                 }else {
                     loadingBar.setTitle("Phone verification");
                     loadingBar.setMessage("please wait...");
@@ -84,9 +86,9 @@ public class PhoneLoginActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
 
                 edtPhone.setVisibility(View.VISIBLE);
-                edtSend.setVisibility(View.VISIBLE);
+                btnSend.setVisibility(View.VISIBLE);
 
-                edtSend.setVisibility(View.INVISIBLE);
+                edtVerification.setVisibility(View.INVISIBLE);
                 btnVerify.setVisibility(View.INVISIBLE);
             }
 
@@ -101,9 +103,9 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 Toast.makeText(PhoneLoginActivity.this, "Code has been sent, please check verify...", Toast.LENGTH_SHORT).show();
 
                 edtPhone.setVisibility(View.INVISIBLE);
-                edtSend.setVisibility(View.INVISIBLE);
+                btnSend.setVisibility(View.INVISIBLE);
 
-                edtSend.setVisibility(View.VISIBLE);
+                edtVerification.setVisibility(View.VISIBLE);
                 btnVerify.setVisibility(View.VISIBLE);
             }
         };
@@ -111,9 +113,9 @@ public class PhoneLoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 edtPhone.setVisibility(View.INVISIBLE);
-                edtSend.setVisibility(View.INVISIBLE);
+                btnSend.setVisibility(View.INVISIBLE);
 
-                String verificationCode = edtSend.getText().toString();
+                String verificationCode = edtVerification.getText().toString();
                 if (TextUtils.isEmpty(verificationCode)) {
                     Toast.makeText(PhoneLoginActivity.this, "please write verification code first...", Toast.LENGTH_SHORT).show();
                 }
@@ -132,7 +134,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
     private void init() {
         edtPhone = findViewById(R.id.edt_phone);
-        edtSend = findViewById(R.id.edt_verification);
+        edtVerification = findViewById(R.id.edt_verification);
         btnSend = findViewById(R.id.btn_send);
         btnVerify = findViewById(R.id.btn_verify);
         loadingBar = new ProgressDialog(this);
