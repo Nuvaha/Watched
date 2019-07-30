@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (currentUser == null){
-            SendUserToLoginActivity();
+            sendUserToLoginActivity();
         }else {
             verifyUserExistance();
         }
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 if (dataSnapshot.child("name").exists()){
                     Toast.makeText(MainActivity.this, "welcome", Toast.LENGTH_SHORT).show();
                 }else {
-                    SendUserToSettingsActivity();
+                    sendUserToSettingsActivity();
                 }
             }
 
@@ -86,14 +86,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-
-    private void SendUserToLoginActivity() {
-        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(loginIntent);
-        finish();
     }
 
     @Override
@@ -107,19 +99,24 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.main_find_friends_option){
-
+            sendUserToFindFriendsActivity();
         }
         if (item.getItemId() == R.id.main_create_group_option){
             requestNewGroup();
         }
         if (item.getItemId() == R.id.main_setting_option){
-            SendUserToSettingsActivity();
+            sendUserToSettingsActivity();
         }
         if (item.getItemId() == R.id.main_logout_option){
             mAuth.signOut();
-            SendUserToLoginActivity();
+            sendUserToLoginActivity();
         }
         return true;
+    }
+
+    private void sendUserToFindFriendsActivity() {
+        Intent findFriendsIntent = new Intent(MainActivity.this, FindFriendsActivity.class);
+        startActivity(findFriendsIntent);
     }
 
     private void requestNewGroup() {
@@ -163,10 +160,17 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void SendUserToSettingsActivity() {
+    private void sendUserToSettingsActivity() {
         Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-        settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        //settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(settingsIntent);
+        //finish();
+    }
+
+    private void sendUserToLoginActivity() {
+        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(loginIntent);
         finish();
     }
 }

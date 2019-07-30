@@ -47,7 +47,12 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        init();
+        edtPhone = findViewById(R.id.edt_phone);
+        edtVerification = findViewById(R.id.edt_verification);
+        btnSend = findViewById(R.id.btn_send);
+        btnVerify = findViewById(R.id.btn_verify);
+        loadingBar = new ProgressDialog(this);
+
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,6 +76,30 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+        btnVerify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                edtPhone.setVisibility(View.INVISIBLE);
+                btnSend.setVisibility(View.INVISIBLE);
+
+                String verificationCode = edtVerification.getText().toString();
+                if (TextUtils.isEmpty(verificationCode)) {
+                    Toast.makeText(PhoneLoginActivity.this, "please write verification code first...", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    loadingBar.setTitle("verification code");
+                    loadingBar.setMessage("please wait, while we are verifying veritication code...");
+                    loadingBar.setCanceledOnTouchOutside(false);
+                    loadingBar.show();
+
+                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, verificationCode);
+                    signInWithPhoneAuthCredential(credential);
+                    sendUserToMainActivity();
+                }
+            }
+        });
+
         callbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
@@ -90,8 +119,10 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
                 edtVerification.setVisibility(View.INVISIBLE);
                 btnVerify.setVisibility(View.INVISIBLE);
+
             }
 
+            @Override
             public void onCodeSent(String verificationId,
                                    PhoneAuthProvider.ForceResendingToken token) {
 
@@ -102,6 +133,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 loadingBar.dismiss();
                 Toast.makeText(PhoneLoginActivity.this, "Code has been sent, please check verify...", Toast.LENGTH_SHORT).show();
 
+
                 edtPhone.setVisibility(View.INVISIBLE);
                 btnSend.setVisibility(View.INVISIBLE);
 
@@ -109,35 +141,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 btnVerify.setVisibility(View.VISIBLE);
             }
         };
-        btnVerify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                edtPhone.setVisibility(View.INVISIBLE);
-                btnSend.setVisibility(View.INVISIBLE);
 
-                String verificationCode = edtVerification.getText().toString();
-                if (TextUtils.isEmpty(verificationCode)) {
-                    Toast.makeText(PhoneLoginActivity.this, "please write verification code first...", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    loadingBar.setTitle("verification code");
-                    loadingBar.setMessage("please wait, while we are verifying veritication code...");
-                    loadingBar.setCanceledOnTouchOutside(false);
-                    loadingBar.show();
-
-                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, verificationCode);
-                    signInWithPhoneAuthCredential(credential);
-                }
-            }
-        });
-    }
-
-    private void init() {
-        edtPhone = findViewById(R.id.edt_phone);
-        edtVerification = findViewById(R.id.edt_verification);
-        btnSend = findViewById(R.id.btn_send);
-        btnVerify = findViewById(R.id.btn_verify);
-        loadingBar = new ProgressDialog(this);
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
@@ -154,12 +158,11 @@ public class PhoneLoginActivity extends AppCompatActivity {
                             Toast.makeText(PhoneLoginActivity.this, "error: " + mesage, Toast.LENGTH_SHORT).show();
                         }
                     }
-
-                    private void sendUserToMainActivity() {
-                        Intent mainIntent = new Intent(PhoneLoginActivity.this, MainActivity.class);
-                        startActivity(mainIntent);
-                        finish();
-                    }
                 });
+    }
+    private void sendUserToMainActivity() {
+        Intent mainIntent = new Intent(PhoneLoginActivity.this, MainActivity.class);
+        startActivity(mainIntent);
+        finish();
     }
 }

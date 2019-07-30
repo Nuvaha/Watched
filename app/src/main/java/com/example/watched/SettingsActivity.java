@@ -3,10 +3,12 @@ package com.example.watched;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.renderscript.Sampler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -48,19 +51,28 @@ public class SettingsActivity extends AppCompatActivity {
 
     private StorageReference UserProfileImageRef;
 
+    private ProgressDialog loadingBar;
+
+    private String url;
+
+    private Toolbar settingToolbar;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         init();
 
-        //edtUsername.setVisibility(View.INVISIBLE);
+        edtUsername.setVisibility(View.INVISIBLE);
 
         mAuth = FirebaseAuth.getInstance();
         currentUserId = mAuth.getCurrentUser().getUid();
         rootRef = FirebaseDatabase.getInstance().getReference();
 
-        UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Prolife Images");
+        UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
+
+        loadingBar = new ProgressDialog(this);
 
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,6 +80,13 @@ public class SettingsActivity extends AppCompatActivity {
                 updateSetting();
             }
         });
+
+        settingToolbar = findViewById(R.id.settings_toolbar);
+        setSupportActionBar(settingToolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Account settings");
+
         retrieveUserInfo();
 
         imgProfile.setOnClickListener(new View.OnClickListener() {
@@ -101,54 +120,55 @@ public class SettingsActivity extends AppCompatActivity {
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
             if (resultCode == RESULT_OK) {
+                loadingBar.setTitle("Set Profile image");
+                loadingBar.setMessage("Please wait, your profile image is updating...");
+                loadingBar.setCanceledOnTouchOutside(false);
+                loadingBar.show();
+
                 Uri resultUri = result.getUri();
 
-                StorageReference filePath = UserProfileImageRef.child(currentUserId + ".jpg");
+                final StorageReference filePath = UserProfileImageRef.child(currentUserId + ".jpg");
                 filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()){
-                            Toast.makeText(SettingsActivity.this, "profile image uploaded successfully...", Toast.LENGTH_SHORT).show();
+                            filePath.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    url = task.getResult().toString();
+                                    Toast.makeText(SettingsActivity.this, "profile image uploaded successfully...",
+                                            Toast.LENGTH_SHORT).show();
+
+                                    //final String downloadUrl = task.getResult().getStorage().getDownloadUrl().toString();
+                                    rootRef.child("User").child(currentUserId).child("image").setValue(url)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()){
+                                                        Toast.makeText(SettingsActivity.this, "Image save in database, successfully...",
+                                                                Toast.LENGTH_SHORT).show();
+                                                        loadingBar.dismiss();
+                                                    }else {
+                                                        String message = task.getException().toString();
+                                                        Toast.makeText(SettingsActivity.this, "Error: " + message,
+                                                                Toast.LENGTH_SHORT).show();
+                                                        loadingBar.dismiss();
+                                                    }
+                                                }
+                                            });
+                                }
+                            });
                         }else {
                             String message = task.getException().toString();
                             Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                            loadingBar.dismiss();
                         }
                     }
                 });
 
             }
-        }
-    }
-
-    private void updateSetting() {
-        String username = edtUsername.getText().toString();
-        String status = edtStatus.getText().toString();
-        if (TextUtils.isEmpty(username)){
-            Toast.makeText(SettingsActivity.this, "please write your user name...", Toast.LENGTH_SHORT).show();
-        }
-        if (TextUtils.isEmpty(status)){
-            Toast.makeText(SettingsActivity.this, "please write your status...", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            HashMap<String, String>profileMap = new HashMap<>();
-            profileMap.put("uid", currentUserId);
-            profileMap.put("name", username);
-            profileMap.put("status", status);
-            rootRef.child("User").child(currentUserId).setValue(profileMap)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                SendUserToMainActivity();
-                                Toast.makeText(SettingsActivity.this, "frofile updated successfully...", Toast.LENGTH_SHORT).show();
-                            }
-                            else {
-                                String message = task.getException().toString();
-                                Toast.makeText(SettingsActivity.this, "error: " + message, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
         }
     }
 
@@ -164,8 +184,7 @@ public class SettingsActivity extends AppCompatActivity {
                     edtUsername.setText(retrieveUserName);
                     edtStatus.setText(retrieveStatus);
 
-
-
+                    Picasso.get().load(retrieveProfileImage).placeholder(R.drawable.profile_image).into(imgProfile);
                 }
                 else if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name"))){
                     String retrieveUserName = dataSnapshot.child("name").getValue().toString();
@@ -175,7 +194,7 @@ public class SettingsActivity extends AppCompatActivity {
                     edtStatus.setText(retrieveStatus);
 
                 }else {
-                    //edtUsername.setVisibility(View.VISIBLE);
+                    edtUsername.setVisibility(View.VISIBLE);
                     Toast.makeText(SettingsActivity.this, "please set & update your", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -187,10 +206,42 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
+    private void updateSetting() {
+        String username = edtUsername.getText().toString();
+        String status = edtStatus.getText().toString();
+        //ImageView temp = new ImageView(SettingsActivity.this);
+
+        if (TextUtils.isEmpty(username)){
+            Toast.makeText(SettingsActivity.this, "please write your user name...", Toast.LENGTH_SHORT).show();
+        }
+        if (TextUtils.isEmpty(status)){
+            Toast.makeText(SettingsActivity.this, "please write your status...", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            HashMap<String, Object> profileMap = new HashMap<>();
+            profileMap.put("uid", currentUserId);
+            profileMap.put("name", username);
+            profileMap.put("status", status);
+            //profileMap.put("image", url);
+            rootRef.child("User").child(currentUserId).updateChildren(profileMap)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                SendUserToMainActivity();
+                                Toast.makeText(SettingsActivity.this, "profile updated successfully...", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                String message = task.getException().toString();
+                                Toast.makeText(SettingsActivity.this, "error: " + message, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+    }
     private void SendUserToMainActivity() {
         Intent mainIntent = new Intent(SettingsActivity.this, MainActivity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
-        //finish();
     }
 }
