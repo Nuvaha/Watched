@@ -1,9 +1,14 @@
-package com.example.watched;
+package com.example.watched.adapter;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import com.example.watched.fragment.ChatsFragment;
+import com.example.watched.fragment.ContactsFragment;
+import com.example.watched.fragment.GroupsFragment;
+import com.example.watched.fragment.RequestsFragment;
 
 public class TabsAccessorAdapter extends FragmentPagerAdapter {
 

@@ -1,4 +1,4 @@
-package com.example.watched;
+package com.example.watched.model;
 
 import android.content.Context;
 

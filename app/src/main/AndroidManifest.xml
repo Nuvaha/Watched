@@ -14,27 +14,27 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ChatActivity"
-            android:parentActivityName=".MainActivity"></activity>
-        <activity android:name=".ProfileActivity" />
+        <activity android:name=".main.ChatActivity"
+            android:parentActivityName=".main.MainActivity"></activity>
+        <activity android:name=".main.ProfileActivity" />
         <activity
-            android:name=".FindFriendsActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity android:name=".PhoneLoginActivity" />
-        <activity android:name=".GroupChatActivity"
-            android:parentActivityName=".MainActivity"/>
+            android:name=".main.FindFriendsActivity"
+            android:parentActivityName=".main.MainActivity" />
+        <activity android:name=".main.PhoneLoginActivity" />
+        <activity android:name=".main.GroupChatActivity"
+            android:parentActivityName=".main.MainActivity"/>
         <activity
-            android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity"></activity>
-        <activity android:name=".MainActivity">
+            android:name=".main.SettingsActivity"
+            android:parentActivityName=".main.MainActivity"></activity>
+        <activity android:name=".main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".main.RegisterActivity" />
+        <activity android:name=".main.LoginActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

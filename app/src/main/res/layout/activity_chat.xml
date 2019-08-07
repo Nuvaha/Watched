@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatActivity">
+    tools:context=".main.ChatActivity">
 
     <include
         android:id="@+id/chat_toolbar"
@@ -22,15 +22,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
         android:background="@android:color/white">
+        <ImageButton
+            android:id="@+id/send_files_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp"
+            android:src="@drawable/send_files"
+            android:backgroundTint="@android:color/white"/>
         <EditText
             android:id="@+id/edt_input_message"
             android:layout_width="0dp"
-            android:layout_weight="9"
+            android:layout_weight="8"
             android:layout_height="wrap_content"
             android:hint="type message here..."
-            android:padding="15dp"/>
+            android:padding="15dp"
+            android:maxLines="5"/>
         <ImageButton
             android:id="@+id/btn_send_message"
             android:layout_width="0dp"

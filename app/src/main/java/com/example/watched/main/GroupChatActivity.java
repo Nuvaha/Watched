@@ -1,4 +1,4 @@
-package com.example.watched;
+package com.example.watched.main;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +13,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.watched.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;

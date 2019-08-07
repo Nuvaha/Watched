@@ -1,15 +1,18 @@
-package com.example.watched;
+package com.example.watched.adapter;
 
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.watched.R;
+import com.example.watched.model.Messages;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,9 +46,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MessagesHolder messagesHolder, int i) {
+    public void onBindViewHolder(@NonNull final MessagesHolder messagesHolder, final int position) {
         String messageSenderId = mAuth.getCurrentUser().getUid();
-        Messages messages = userMessageList.get(i);
+        Messages messages = userMessageList.get(position);
 
         String fromUserID = messages.getFrom();
         String fromMessageType = messages.getType();
@@ -66,11 +69,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
             }
         });
-        if (fromMessageType.equals("text")){
-            messagesHolder.tvReceiverMessage.setVisibility(View.INVISIBLE);
-            messagesHolder.receiverProfileImage.setVisibility(View.INVISIBLE);
 
-            messagesHolder.tvSenderMessage.setVisibility(View.INVISIBLE);
+
+        messagesHolder.tvReceiverMessage.setVisibility(View.GONE);
+        messagesHolder.receiverProfileImage.setVisibility(View.GONE);
+        messagesHolder.tvSenderMessage.setVisibility(View.GONE);
+        messagesHolder.messageSenderPicture.setVisibility(View.GONE);
+        messagesHolder.messageReceiverPicture.setVisibility(View.GONE);
+
+
+
+        if (fromMessageType.equals("text")){
 
             if (fromUserID.equals(messageSenderId)){
 
@@ -78,7 +87,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
                 messagesHolder.tvSenderMessage.setBackgroundResource(R.drawable.sender_messages_layout);
                 messagesHolder.tvSenderMessage.setTextColor(Color.WHITE);
-                messagesHolder.tvSenderMessage.setText(messages.getMessage());
+                messagesHolder.tvSenderMessage.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
 
             }else {
                 messagesHolder.receiverProfileImage.setVisibility(View.VISIBLE);
@@ -86,9 +95,55 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
                 messagesHolder.tvReceiverMessage.setBackgroundResource(R.drawable.receiver_messages_layout);
                 messagesHolder.tvReceiverMessage.setTextColor(Color.BLACK);
-                messagesHolder.tvReceiverMessage.setText(messages.getMessage());
+                messagesHolder.tvReceiverMessage.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
             }
         }
+        else if (fromMessageType.equals("image")){
+            if (fromUserID.equals(messageSenderId)){
+
+                messagesHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+
+                Picasso.get().load(messages.getMessage()).into(messagesHolder.messageSenderPicture);
+            }
+            else {
+
+                messagesHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+                messagesHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+
+                Picasso.get().load(messages.getMessage()).into(messagesHolder.messageReceiverPicture);
+
+            }
+        }
+        /*else {
+            if (fromUserID.equals(messageSenderId)){
+                messagesHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+
+                messagesHolder.messageSenderPicture.setBackgroundResource(R.drawable.file);
+
+                messagesHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessageList.get(position).getMessage()));
+                        messagesHolder.itemView.getContext().startActivity(intent);
+
+                    }
+                });
+            }
+            else {
+                messagesHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+                messagesHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+
+                messagesHolder.messageReceiverPicture.setBackgroundResource(R.drawable.file);
+
+                messagesHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessageList.get(position).getMessage()));
+                        messagesHolder.itemView.getContext().startActivity(intent);
+                    }
+                });
+            }
+        }*/
     }
 
     @Override
@@ -101,12 +156,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         private TextView tvReceiverMessage;
         private CircleImageView receiverProfileImage;
 
+        private ImageView messageSenderPicture, messageReceiverPicture;
+
         public MessagesHolder(@NonNull View itemView) {
             super(itemView);
 
             tvSenderMessage = itemView.findViewById(R.id.sender_message_text);
             tvReceiverMessage = itemView.findViewById(R.id.receiver_message_text);
             receiverProfileImage = itemView.findViewById(R.id.message_profile_image);
+
+            messageSenderPicture = itemView.findViewById(R.id.message_sender_image_view);
+            messageReceiverPicture = itemView.findViewById(R.id.message_receiver_image_view);
         }
     }
 }

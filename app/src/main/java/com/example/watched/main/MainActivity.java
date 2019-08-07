@@ -1,4 +1,4 @@
-package com.example.watched;
+package com.example.watched.main;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.watched.R;
+import com.example.watched.adapter.TabsAccessorAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,6 +27,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
@@ -32,8 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout myTabLayout;
     private TabsAccessorAdapter myTabsAccessorAdapter;
 
-    private FirebaseUser currentUser;
+    //private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
+    private String currentUserId;
 
     private DatabaseReference rootRef;
 
@@ -43,11 +50,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
+        //currentUser = mAuth.getCurrentUser();
+
+        //currentUserId = mAuth.getCurrentUser().getUid();
 
         mToolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Watched");
+        getSupportActionBar().setTitle("Chat App");
 
         myViewPager = findViewById(R.id.main_app_pager);
         myTabsAccessorAdapter = new TabsAccessorAdapter(getSupportFragmentManager());
@@ -62,10 +71,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null){
+
             sendUserToLoginActivity();
+
         }else {
+
+            updateUserStatus("online");
+
             verifyUserExistance();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null){
+            updateUserStatus("offline");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null){
+            updateUserStatus("offline");
         }
     }
 
@@ -99,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.main_find_friends_option){
+
             sendUserToFindFriendsActivity();
         }
         if (item.getItemId() == R.id.main_create_group_option){
@@ -108,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
             sendUserToSettingsActivity();
         }
         if (item.getItemId() == R.id.main_logout_option){
+
+            updateUserStatus("offline");
+
             mAuth.signOut();
             sendUserToLoginActivity();
         }
@@ -172,5 +212,25 @@ public class MainActivity extends AppCompatActivity {
         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(loginIntent);
         finish();
+    }
+
+    private  void updateUserStatus(String state){
+        String saveCurrentTime, saveCurrentDate;
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat  currentDateFormat = new SimpleDateFormat("MMM dd, yyyy");
+        saveCurrentDate = currentDateFormat.format(calendar.getTime());
+
+        SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm a");
+        saveCurrentTime = currentTimeFormat.format(calendar.getTime());
+
+        HashMap<String, Object> onlineStateMap = new HashMap<>();
+
+        onlineStateMap.put("date", saveCurrentDate);
+        onlineStateMap.put("state", state);
+        onlineStateMap.put("time", saveCurrentTime);
+
+        currentUserId = mAuth.getCurrentUser().getUid();
+        rootRef.child("User").child(currentUserId).child("userState")
+                .updateChildren(onlineStateMap);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.watched;
+package com.example.watched.fragment;
 
 
 import android.content.Intent;
@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.watched.model.Contacts;
+import com.example.watched.R;
+import com.example.watched.main.ChatActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -83,11 +86,27 @@ public class ChatsFragment extends Fragment {
 
                                         Picasso.get().load(imProfile[0]).placeholder(R.drawable.profile_image).into(holder.imProfile);
                                     }
+
                                     final String tvUserName = dataSnapshot.child("name").getValue().toString();
-                                    String tvUserStatus = dataSnapshot.child("status").getValue().toString();
+                                    final String tvUserStatus = dataSnapshot.child("status").getValue().toString();
 
                                     holder.tvUserName.setText(tvUserName);
-                                    holder.tvUserStatus.setText("Last seen: " + "\n" + "Date " + "time");
+
+                                    if (dataSnapshot.child("userState").hasChild("state")){
+                                        String state = dataSnapshot.child("userState").child("state").getValue().toString();
+                                        String time = dataSnapshot.child("userState").child("time").getValue().toString();
+                                        String date = dataSnapshot.child("userState").child("date").getValue().toString();
+
+                                        if (state.equals("online")){
+                                            holder.tvUserStatus.setText("Online Now");
+                                        }
+                                        else if (state.equals("offline")){
+
+                                            holder.tvUserStatus.setText("Last seen: " + time + " " + date);
+                                        }
+                                    }else {
+                                        holder.tvUserStatus.setText("Offline");
+                                    }
 
                                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                                         @Override
@@ -135,5 +154,6 @@ public class ChatsFragment extends Fragment {
             tvUserStatus = itemView.findViewById(R.id.tv_user_status);
             imProfile = itemView.findViewById(R.id.user_profile_name);
         }
+
     }
 }

@@ -1,4 +1,4 @@
-package com.example.watched;
+package com.example.watched.fragment;
 
 
 import android.content.Intent;
@@ -11,8 +11,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.example.watched.R;
+import com.example.watched.main.GroupChatActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

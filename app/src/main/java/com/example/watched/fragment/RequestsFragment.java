@@ -1,4 +1,4 @@
-package com.example.watched;
+package com.example.watched.fragment;
 
 
 import android.app.AlertDialog;
@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.watched.R;
+import com.example.watched.model.Contacts;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -172,6 +174,77 @@ public class RequestsFragment extends Fragment {
                                                                                                     public void onComplete(@NonNull Task<Void> task) {
                                                                                                         if (task.isSuccessful()){
                                                                                                             Toast.makeText(getContext(),"Contact deleted", Toast.LENGTH_SHORT).show();
+                                                                                                        }
+                                                                                                    }
+                                                                                                });
+                                                                                    }
+                                                                                }
+                                                                            });
+                                                                }
+                                                            }
+                                                        });
+                                                        builder.show();
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                    }
+                                    else if (type.equals("sent"))
+                                    {
+                                        Button request_sent_btn = holder.itemView.findViewById(R.id.request_accept_btn);
+                                        request_sent_btn.setText("Req sent");
+
+                                        holder.itemView.findViewById(R.id.request_cancel_btn).setVisibility(View.INVISIBLE);
+
+                                        userRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.hasChild("image")){
+                                                    //final String userName = dataSnapshot.child("name").getValue().toString();
+                                                    //final String userStatus = dataSnapshot.child("status").getValue().toString();
+                                                    final String profileImage = dataSnapshot.child("image").getValue().toString();
+
+                                                    //holder.tvUserName.setText(userName);
+                                                    //holder.tvUserStatus.setText(userStatus);
+                                                    Picasso.get().load(profileImage).placeholder(R.drawable.profile_image).into(holder.profileImage);
+                                                }
+                                                final String userName = dataSnapshot.child("name").getValue().toString();
+                                                final String userStatus = dataSnapshot.child("status").getValue().toString();
+
+                                                holder.tvUserName.setText(userName);
+                                                holder.tvUserStatus.setText("You have sent a request to " + userName);
+
+                                                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        CharSequence options[] = new CharSequence[]{
+                                                                "Cancel Chat Request"
+                                                        };
+                                                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                                        builder.setTitle("Already sent request");
+
+                                                        builder.setItems(options, new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int i) {
+                                                                if (i == 0){
+                                                                    chatRequestsRef.child(currentUserId).child(list_user_id)
+                                                                            .removeValue()
+                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                    if (task.isSuccessful()){
+                                                                                        chatRequestsRef.child(list_user_id).child(currentUserId)
+                                                                                                .removeValue()
+                                                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                    @Override
+                                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                                        if (task.isSuccessful()){
+                                                                                                            Toast.makeText(getContext(),"You have cancelled the chat request", Toast.LENGTH_SHORT).show();
                                                                                                         }
                                                                                                     }
                                                                                                 });
