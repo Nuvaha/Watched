@@ -14,18 +14,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".main.ChatActivity"
-            android:parentActivityName=".main.MainActivity"></activity>
+        <activity android:name=".main.ImageViewerActivity"></activity>
+        <activity
+            android:name=".main.ChatActivity"
+            android:parentActivityName=".main.MainActivity" />
         <activity android:name=".main.ProfileActivity" />
         <activity
             android:name=".main.FindFriendsActivity"
             android:parentActivityName=".main.MainActivity" />
         <activity android:name=".main.PhoneLoginActivity" />
-        <activity android:name=".main.GroupChatActivity"
-            android:parentActivityName=".main.MainActivity"/>
+        <activity
+            android:name=".main.GroupChatActivity"
+            android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".main.SettingsActivity"
-            android:parentActivityName=".main.MainActivity"></activity>
+            android:parentActivityName=".main.MainActivity" />
         <activity android:name=".main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,6 +36,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".main.RegisterActivity" />
         <activity android:name=".main.LoginActivity" />
         <activity
