@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -213,11 +215,37 @@ public class ChatActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 438 && resultCode == RESULT_OK && data != null && data.getData() != null ){
+            final Handler handler = new Handler(){
+                public void handleMessage(Message msg){
+                    super.handleMessage(msg);
+                    loadingbar.incrementProgressBy(4);
+                }
+            };
             messagesList.clear();
             loadingbar.setTitle("Sending file");
-            loadingbar.setMessage("Please wait,we are sending that file... ");
-            loadingbar.setCanceledOnTouchOutside(false);
+            //loadingbar.setMessage("Please wait,we are sending that file... ");
+            loadingbar.setMax(100);
+            loadingbar.setMessage("Loading...");
+            loadingbar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            //loadingbar.setCanceledOnTouchOutside(false);
             loadingbar.show();
+            loadingbar.setCancelable(false);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        while (loadingbar.getProgress() <= loadingbar.getMax()){
+                            Thread.sleep(200);
+                            handler.sendMessage(handler.obtainMessage());
+                            if (loadingbar.getProgress() == loadingbar.getMax()){
+                                loadingbar.dismiss();
+                            }
+                        }
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                }
+            }).start();
 
             fileUri = data.getData();
 
@@ -235,7 +263,6 @@ public class ChatActivity extends AppCompatActivity {
 
                 final  StorageReference filePath = storageReference.child(messagePushId + "." + checker);
                 uploadTask = filePath.putFile(fileUri);
-
 
                 uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -344,7 +371,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void displayLastSeen(){
-        rootRef.child("User").child(messageSenderId)
+        rootRef.child("User").child(messageReceiverId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -356,13 +383,14 @@ public class ChatActivity extends AppCompatActivity {
                             if (state.equals("online")){
 
                                 userLastSeen.setText("Online Now");
+
                             }else if (state.equals("offline")){
 
                                 userLastSeen.setText("Last seen: " + date + "  " + time);
                             }
-                        }else {
-                            userLastSeen.setText("Offline");
-                        }
+                            }else {
+                                userLastSeen.setText("Offline");
+                            }
                     }
 
                     @Override
@@ -438,4 +466,5 @@ public class ChatActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
     }
+
 }

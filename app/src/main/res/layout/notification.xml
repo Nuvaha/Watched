@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:gravity="center">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:background="@android:color/white">
+        <RelativeLayout
+            android:id="@+id/tv_img"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/colorPrimaryDark">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Error"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="30sp"
+                android:paddingLeft="5dp"
+                android:paddingTop="2dp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/close"
+                android:layout_alignParentRight="true"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_below="@+id/tv_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="50dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/img_cancel"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/cancel"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/img_cancel"
+                android:text="asdsa adssad ads"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:paddingTop="35dp"/>
+            <TextView
+                android:id="@+id/tv"
+                android:layout_below="@id/img_cancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="asdas asdasd asdas asd"
+                android:textSize="26sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

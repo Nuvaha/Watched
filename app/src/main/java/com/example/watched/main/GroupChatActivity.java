@@ -130,7 +130,6 @@ public class GroupChatActivity extends AppCompatActivity {
                     currentUserName = dataSnapshot.child("name").getValue().toString();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 

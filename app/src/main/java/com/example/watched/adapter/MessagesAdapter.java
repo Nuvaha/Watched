@@ -21,6 +21,8 @@ import com.example.watched.main.ImageViewerActivity;
 import com.example.watched.main.MainActivity;
 import com.example.watched.model.Messages;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -28,8 +30,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -196,7 +203,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                                     intent.putExtra("url", userMessageList.get(position).getMessage());
                                     messagesHolder.itemView.getContext().startActivity(intent);
                                 }
-
                             }
                         });
                         builder.show();
@@ -213,7 +219,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                             public void onClick(DialogInterface dialog, int i) {
                                 if (i == 0){
                                     deleteSentMessage(position, messagesHolder);
-                                    Intent intent = new Intent(messagesHolder.itemView.getContext(), MainActivity.class);
+                                    Intent intent = new Intent(messagesHolder.itemView.getContext(), ChatActivity.class);
                                     messagesHolder.itemView.getContext().startActivity(intent);
 
                                 }
@@ -289,7 +295,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                             public void onClick(DialogInterface dialog, int i) {
                                 if (i == 0){
                                     deleteReceiverMessage(position, messagesHolder);
-                                    Intent intent = new Intent(messagesHolder.itemView.getContext(), MainActivity.class);
+                                    Intent intent = new Intent(messagesHolder.itemView.getContext(), ChatActivity.class);
                                     messagesHolder.itemView.getContext().startActivity(intent);
                                 }
                             }
@@ -358,6 +364,35 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                 }
                 else {
                     Toast.makeText(holder.itemView.getContext(), "Error Occurred.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void deleteSentReceiverMessage(final int position, final MessagesHolder holder){
+        final DatabaseReference rooRef = FirebaseDatabase.getInstance().getReference();
+        rooRef.child("Messages")
+                .child(userMessageList.get(position).getFrom())
+                .child(userMessageList.get(position).getTo())
+                .child(userMessageList.get(position).getMessageId())
+                .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    rooRef.child("Messages")
+                            .child(userMessageList.get(position).getTo())
+                            .child(userMessageList.get(position).getFrom())
+                            .child(userMessageList.get(position).getMessageId())
+                            .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                Toast.makeText(holder.itemView.getContext(), "Delete Successfully", Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(holder.itemView.getContext(), "Error Occurred.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                 }
             }
         });

@@ -13,7 +13,6 @@
         android:src="@drawable/login_photo"
         />
     <EditText
-        android:layout_marginTop="20dp"
         android:id="@+id/edt_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +20,6 @@
         android:drawableLeft="@drawable/email"
         />
     <EditText
-        android:layout_marginTop="10dp"
         android:id="@+id/edt_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,7 +27,6 @@
         android:inputType="textPassword"
         android:drawableLeft="@drawable/password"/>
     <TextView
-        android:layout_marginTop="10dp"
         android:id="@+id/tv_forget_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,8 +50,7 @@
         android:textStyle="bold"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18sp"
-        android:gravity="center"
-        android:layout_marginTop="20dp"/>
+        android:gravity="center"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,6 +66,5 @@
         android:background="@color/colorPrimaryDark"
         android:text="Phone"
         android:textStyle="bold"
-        android:textColor="@android:color/white"
-        android:layout_marginTop="30dp"/>
+        android:textColor="@android:color/white"/>
 </LinearLayout>

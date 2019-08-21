@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.watched.model.Contacts;
@@ -88,24 +89,37 @@ public class ChatsFragment extends Fragment {
                                     }
 
                                     final String tvUserName = dataSnapshot.child("name").getValue().toString();
-                                    final String tvUserStatus = dataSnapshot.child("status").getValue().toString();
 
                                     holder.tvUserName.setText(tvUserName);
+
 
                                     if (dataSnapshot.child("userState").hasChild("state")){
                                         String state = dataSnapshot.child("userState").child("state").getValue().toString();
                                         String time = dataSnapshot.child("userState").child("time").getValue().toString();
                                         String date = dataSnapshot.child("userState").child("date").getValue().toString();
 
+                                        holder.tvUserStatus.setText(state);
+
                                         if (state.equals("online")){
-                                            holder.tvUserStatus.setText("Online Now");
+                                            String tvUserStatus = dataSnapshot.child("status").getValue().toString();
+
+                                            holder.tvUserStatus.setText(tvUserStatus);
+                                            holder.onlineIocon.setVisibility(View.VISIBLE);
+
                                         }
                                         else if (state.equals("offline")){
+                                           // holder.tvUserStatus.setText("Last seen: " + time + " " + date);
+                                            String tvUserStatus = dataSnapshot.child("status").getValue().toString();
 
-                                            holder.tvUserStatus.setText("Last seen: " + time + " " + date);
+                                            holder.tvUserStatus.setText(tvUserStatus);
+                                            holder.onlineIocon.setVisibility(View.INVISIBLE);
                                         }
                                     }else {
+                                        String tvUserStatus = dataSnapshot.child("status").getValue().toString();
+
+                                        holder.tvUserStatus.setText(tvUserStatus);
                                         holder.tvUserStatus.setText("Offline");
+                                        holder.onlineIocon.setVisibility(View.INVISIBLE);
                                     }
 
                                     holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -139,6 +153,7 @@ public class ChatsFragment extends Fragment {
                 };
         chatsList.setAdapter(adapter);
         adapter.startListening();
+
     }
 
     public static class ChatsViewHolder extends RecyclerView.ViewHolder{
@@ -146,6 +161,7 @@ public class ChatsFragment extends Fragment {
         private TextView tvUserName;
         private TextView tvUserStatus;
         private CircleImageView imProfile;
+        private ImageView onlineIocon;
 
         public ChatsViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -153,7 +169,9 @@ public class ChatsFragment extends Fragment {
             tvUserName = itemView.findViewById(R.id.tv_user_name);
             tvUserStatus = itemView.findViewById(R.id.tv_user_status);
             imProfile = itemView.findViewById(R.id.user_profile_name);
+            onlineIocon = itemView.findViewById(R.id.image_user_online_status);
         }
-
     }
+
+
 }

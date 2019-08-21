@@ -72,8 +72,8 @@ public class RequestsFragment extends Fragment {
 
         final FirebaseRecyclerOptions options =
                 new FirebaseRecyclerOptions.Builder<Contacts>()
-                .setQuery(chatRequestsRef.child(currentUserId), Contacts.class)
-                .build();
+                        .setQuery(chatRequestsRef.child(currentUserId), Contacts.class)
+                        .build();
 
         FirebaseRecyclerAdapter<Contacts, RequestsViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, RequestsViewHolder>(options) {

@@ -63,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(password)){
                     Toast.makeText( LoginActivity.this, "please enter password", Toast.LENGTH_SHORT).show();
                 }else {
-
                     loadingBar.setTitle("Sign in");
                     loadingBar.setMessage("please wait...");
                     loadingBar.setCanceledOnTouchOutside(true);

@@ -1,6 +1,9 @@
 package com.example.watched.fragment;
 
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.watched.R;
 import com.example.watched.main.GroupChatActivity;
@@ -38,6 +42,8 @@ public class GroupsFragment extends Fragment {
 
     private DatabaseReference groupRef;
 
+    private ProgressDialog dialog;
+
 
     public GroupsFragment() {
         // Required empty public constructor
@@ -50,6 +56,8 @@ public class GroupsFragment extends Fragment {
         groupFramentView = inflater.inflate(R.layout.fragment_groups, container, false);
 
         groupRef = FirebaseDatabase.getInstance().getReference().child("Group");
+
+        dialog = new ProgressDialog(getContext());
         init();
 
         retrieveAndDisplayGroup();
@@ -62,6 +70,33 @@ public class GroupsFragment extends Fragment {
                 groupChatIntent.putExtra("GroupName", currentGroupName);
                 startActivity(groupChatIntent);
             }
+        });
+
+        list_view.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Are you sure you want to delete this?");
+                builder.setCancelable(false);
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        list_of_group.remove(position);
+                        arrayAdapter.notifyDataSetChanged();
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        }
+                );
+                builder.show();
+                return true;
+            }
+
         });
 
         return groupFramentView;
