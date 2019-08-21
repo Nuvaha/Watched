@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -47,10 +49,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
 
+
     public MessagesAdapter(List<Messages> userMessageList){
         this.userMessageList = userMessageList;
+        notifyDataSetChanged();
     }
-
 
     @NonNull
     @Override
@@ -177,6 +180,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                                 else if (i == 1){
                                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessageList.get(position).getMessage()));
                                     messagesHolder.itemView.getContext().startActivity(intent);
+                                }else if (i == 2){
+                                    dialog.cancel();
                                 }
                             }
                         });
@@ -202,6 +207,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                                     Intent intent = new Intent(messagesHolder.itemView.getContext(), ImageViewerActivity.class);
                                     intent.putExtra("url", userMessageList.get(position).getMessage());
                                     messagesHolder.itemView.getContext().startActivity(intent);
+                                }else if (i == 2){
+                                    dialog.cancel();
                                 }
                             }
                         });
@@ -219,9 +226,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                             public void onClick(DialogInterface dialog, int i) {
                                 if (i == 0){
                                     deleteSentMessage(position, messagesHolder);
-                                    Intent intent = new Intent(messagesHolder.itemView.getContext(), ChatActivity.class);
+                                    notifyDataSetChanged();
+                                    Intent intent = new Intent(messagesHolder.itemView.getContext(), MainActivity.class);
                                     messagesHolder.itemView.getContext().startActivity(intent);
-
+                                }else if (i == 1){
+                                    dialog.cancel();
                                 }
                             }
                         });
@@ -250,9 +259,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                                     Intent intent = new Intent(messagesHolder.itemView.getContext(), MainActivity.class);
                                     messagesHolder.itemView.getContext().startActivity(intent);
                                 }
-                                if (i == 1){
+                                else if (i == 1){
                                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessageList.get(position).getMessage()));
                                     messagesHolder.itemView.getContext().startActivity(intent);
+                                }else if (i == 2){
+                                    dialog.cancel();
                                 }
                             }
                         });
@@ -274,10 +285,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                                     Intent intent = new Intent(messagesHolder.itemView.getContext(), MainActivity.class);
                                     messagesHolder.itemView.getContext().startActivity(intent);
                                 }
-                                if (i == 1){
+                                else if (i == 1){
                                     Intent intent = new Intent(messagesHolder.itemView.getContext(), ImageViewerActivity.class);
                                     intent.putExtra("url", userMessageList.get(position).getMessage());
                                     messagesHolder.itemView.getContext().startActivity(intent);
+                                }
+                                else if (i == 2){
+                                    dialog.cancel();
                                 }
                             }
                         });
@@ -295,8 +309,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                             public void onClick(DialogInterface dialog, int i) {
                                 if (i == 0){
                                     deleteReceiverMessage(position, messagesHolder);
-                                    Intent intent = new Intent(messagesHolder.itemView.getContext(), ChatActivity.class);
+
+                                    Intent intent = new Intent(messagesHolder.itemView.getContext(), MainActivity.class);
                                     messagesHolder.itemView.getContext().startActivity(intent);
+                                }else if (i == 1){
+                                    dialog.cancel();
                                 }
                             }
                         });
@@ -370,8 +387,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     }
 
     private void deleteSentReceiverMessage(final int position, final MessagesHolder holder){
-        final DatabaseReference rooRef = FirebaseDatabase.getInstance().getReference();
-        rooRef.child("Messages")
+        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        rootRef.child("Messages")
                 .child(userMessageList.get(position).getFrom())
                 .child(userMessageList.get(position).getTo())
                 .child(userMessageList.get(position).getMessageId())
@@ -379,20 +396,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
-                    rooRef.child("Messages")
+                    rootRef.child("Messages")
                             .child(userMessageList.get(position).getTo())
                             .child(userMessageList.get(position).getFrom())
                             .child(userMessageList.get(position).getMessageId())
-                            .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                Toast.makeText(holder.itemView.getContext(), "Delete Successfully", Toast.LENGTH_SHORT).show();
-                            }else {
-                                Toast.makeText(holder.itemView.getContext(), "Error Occurred.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+                            .removeValue();
+                }else {
+                    Toast.makeText(holder.itemView.getContext(), "Error Occerred", Toast.LENGTH_SHORT).show();
                 }
             }
         });

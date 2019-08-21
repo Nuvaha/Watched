@@ -446,6 +446,7 @@ public class ChatActivity extends AppCompatActivity {
             messageBodyDetails.put(messageSenderRef + "/" + messagePushId, messageTextBody);
             messageBodyDetails.put(messageReceiverRef + "/" + messagePushId, messageTextBody);
 
+            messagesAdapter.notifyDataSetChanged();
             rootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {

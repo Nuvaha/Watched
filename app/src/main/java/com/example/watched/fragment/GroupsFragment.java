@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,16 +75,25 @@ public class GroupsFragment extends Fragment {
 
         list_view.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+            public boolean onItemLongClick(final AdapterView<?> parent, View view, final int position, final long id) {
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setMessage("Are you sure you want to delete this?");
                 builder.setCancelable(false);
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        list_of_group.remove(position);
-                        arrayAdapter.notifyDataSetChanged();
+                    public void onClick(DialogInterface dialog, int i) {
+                        try {
+                            groupRef.child(arrayAdapter.getItem(position)).removeValue();
+                            list_of_group.remove(position);
+                            arrayAdapter.remove(String.valueOf(position));
+                            arrayAdapter.notifyDataSetChanged();
 
+                            dialog.dismiss();
+
+                        }catch (Exception ex){
+                            Toast.makeText(getContext(),(CharSequence) ex, Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -93,7 +103,11 @@ public class GroupsFragment extends Fragment {
                             }
                         }
                 );
-                builder.show();
+                try {
+                    builder.show();
+                }catch (Exception e){
+                    Log.d("Error", e.getMessage());
+                }
                 return true;
             }
 
@@ -115,7 +129,6 @@ public class GroupsFragment extends Fragment {
                 list_of_group.addAll(set);
                 arrayAdapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -128,5 +141,4 @@ public class GroupsFragment extends Fragment {
         arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, list_of_group);
         list_view.setAdapter(arrayAdapter);
     }
-
 }
