@@ -6,12 +6,12 @@
     android:orientation="vertical"
     android:paddingLeft="10sp"
     android:paddingRight="10dp"
+    android:gravity="center"
     >
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="260sp"
-        android:src="@drawable/login_photo"
-        />
+ <ImageView
+     android:layout_width="wrap_content"
+     android:layout_height="260dp"
+     android:src="@drawable/login_photo"/>
     <EditText
         android:id="@+id/edt_email"
         android:layout_width="match_parent"
@@ -58,13 +58,5 @@
         android:text="or login using your"
         android:textSize="18sp"
         android:textStyle="bold"/>
-    <Button
-        android:id="@+id/btn_Phone"
-        android:drawableLeft="@drawable/phone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
-        android:text="Phone"
-        android:textStyle="bold"
-        android:textColor="@android:color/white"/>
+
 </LinearLayout>

@@ -52,8 +52,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
     public MessagesAdapter(List<Messages> userMessageList){
         this.userMessageList = userMessageList;
-        notifyDataSetChanged();
     }
+
 
     @NonNull
     @Override
@@ -226,7 +226,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                             public void onClick(DialogInterface dialog, int i) {
                                 if (i == 0){
                                     deleteSentMessage(position, messagesHolder);
-                                    notifyDataSetChanged();
                                     Intent intent = new Intent(messagesHolder.itemView.getContext(), MainActivity.class);
                                     messagesHolder.itemView.getContext().startActivity(intent);
                                 }else if (i == 1){
@@ -309,7 +308,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                             public void onClick(DialogInterface dialog, int i) {
                                 if (i == 0){
                                     deleteReceiverMessage(position, messagesHolder);
-
                                     Intent intent = new Intent(messagesHolder.itemView.getContext(), MainActivity.class);
                                     messagesHolder.itemView.getContext().startActivity(intent);
                                 }else if (i == 1){
@@ -381,28 +379,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                 }
                 else {
                     Toast.makeText(holder.itemView.getContext(), "Error Occurred.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    private void deleteSentReceiverMessage(final int position, final MessagesHolder holder){
-        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        rootRef.child("Messages")
-                .child(userMessageList.get(position).getFrom())
-                .child(userMessageList.get(position).getTo())
-                .child(userMessageList.get(position).getMessageId())
-                .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    rootRef.child("Messages")
-                            .child(userMessageList.get(position).getTo())
-                            .child(userMessageList.get(position).getFrom())
-                            .child(userMessageList.get(position).getMessageId())
-                            .removeValue();
-                }else {
-                    Toast.makeText(holder.itemView.getContext(), "Error Occerred", Toast.LENGTH_SHORT).show();
                 }
             }
         });

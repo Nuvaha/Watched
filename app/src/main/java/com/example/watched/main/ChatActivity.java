@@ -98,11 +98,9 @@ public class ChatActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
 
-        messageReceiverId = bundle.getString("visit_user_id");
-        messageReceiverName = bundle.getString("visit_user_name");
-        messageReceiverImage = bundle.getString("visit_image");
-
-
+            messageReceiverId = bundle.getString("visit_user_id");
+            messageReceiverName = bundle.getString("visit_user_name");
+            messageReceiverImage = bundle.getString("visit_image");
 
 
         //Toast.makeText(ChatActivity.this, messageReceiverId, Toast.LENGTH_SHORT).show();
@@ -198,7 +196,7 @@ public class ChatActivity extends AppCompatActivity {
         linearLayoutManager = new LinearLayoutManager(this);
         userMessageList.setLayoutManager(linearLayoutManager);
         userMessageList.setAdapter(messagesAdapter);
-
+        messagesAdapter.notifyDataSetChanged();
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat currentDateFormat = new SimpleDateFormat("MMM dd, yyyy");
@@ -206,8 +204,6 @@ public class ChatActivity extends AppCompatActivity {
 
         SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm a");
         saveCurrentTime = currentTimeFormat.format(calendar.getTime());
-
-
     }
 
     @Override
@@ -345,6 +341,7 @@ public class ChatActivity extends AppCompatActivity {
                             messageBodyDetails.put(messageSenderRef + "/" + messagePushId,messageTextBody);
                             messageBodyDetails.put(messageReceiverRef + "/" + messagePushId,messageTextBody);
 
+
                             rootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                                 @Override
                                 public void onComplete(@NonNull Task task) {
@@ -446,7 +443,6 @@ public class ChatActivity extends AppCompatActivity {
             messageBodyDetails.put(messageSenderRef + "/" + messagePushId, messageTextBody);
             messageBodyDetails.put(messageReceiverRef + "/" + messagePushId, messageTextBody);
 
-            messagesAdapter.notifyDataSetChanged();
             rootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {

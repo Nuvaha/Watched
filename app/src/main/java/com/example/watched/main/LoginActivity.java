@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private FirebaseUser currentUser;
     private EditText edtEmail, edtPassword;
-    private Button btnLogin, btnPhone;
+    private Button btnLogin;
     private TextView tvForgetPassword, tvNeedNewAccount;
 
     private FirebaseAuth mAuth;
@@ -99,13 +99,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-       btnPhone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent phoneIntent = new Intent(LoginActivity.this, PhoneLoginActivity.class);
-                startActivity(phoneIntent);
-            }
-        });
     }
     private void init() {
         btnLogin = findViewById(R.id.btn_login);
@@ -114,7 +107,6 @@ public class LoginActivity extends AppCompatActivity {
         tvForgetPassword = findViewById(R.id.tv_forget_password);
         tvNeedNewAccount = findViewById(R.id.tv_need_new_account);
 
-        btnPhone = findViewById(R.id.btn_Phone);
         loadingBar = new ProgressDialog(this);
     }
     @Override
